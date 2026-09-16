@@ -2,6 +2,8 @@
 
 A React and TypeScript movie search application built with Vite. It uses the OMDb API for movie searches and Firebase Authentication and Cloud Firestore for user accounts and favourites.
 
+**Live app:** _add your Netlify URL here_
+
 ## Development
 
 ```bash
@@ -121,3 +123,36 @@ The following user prompts were used to build the application incrementally:
 25. **Style Auth and add conditional Header authentication actions**
 
     Style the Auth page to match the app's dark theme, including the form card, inputs, submit button, and mode-switch button. Add a Login link to `/auth` when no user is signed in, and show Logout instead when a user is signed in.
+
+## How AI Assisted
+
+I built this app almost entirely through prompts to GitHub Copilot (in VS Code), following a structured, incremental sequence rather than asking for the whole app in one go — one small, scoped prompt per feature (project setup, then the Header, then each screen's Model/ViewModel/View layer, then Firebase auth and favourites, then styling), running lint and build checks after nearly every step. This kept each change small enough to actually review before building the next thing on top of it.
+
+AI handled the bulk of the implementation work: scaffolding the project, writing the OMDb API service and TypeScript types, building each screen's MVVM logic, wiring up Firebase Authentication and Firestore, and styling the UI. But it also did more than generate code on request — several times it diagnosed its own problems mid-task: it recognized a broken local `firebase` package install and (imperfectly, see below) tried to patch around it, it caught a React Fast Refresh lint violation and restructured files to fix it, and it flagged a Windows-specific filename collision and renamed a file to resolve it, all without me having to point out the underlying cause first.
+
+Where I made the calls: deciding the overall architecture (I intentionally kept Cloud Firestore instead of switching to Realtime Database, since Firestore is the better default and there was no code already invested in the other choice), deciding what to build in what order, writing prompts that consolidated several of the original tutorial's smaller steps into single, more complete prompts, and reviewing every result before moving on rather than assuming a passing build meant the feature actually worked. A recurring lesson from this project: a clean `npm run lint` and `npm run build` say nothing about runtime behavior — several real bugs (a blank Favourites page, a favourite button that silently did nothing) only showed up when I actually used the app and checked the browser console and network tab myself.
+
+## Manual Corrections, Debugging, and Refactoring
+
+**1. Diagnosed a corrupted package install instead of accepting AI's workaround.**
+After asking Copilot to set up Firebase, the build failed with missing TypeScript declarations for the `firebase` package. Rather than reinstalling the package, Copilot wrote a custom hand-rolled `.d.ts` declaration file to work around the missing types. I recognized this as patching a symptom rather than fixing the actual problem — a properly published SDK shouldn't need a developer-authored type shim — and instead did a clean reinstall (`rm -rf node_modules package-lock.json`, `npm cache clean --force`, `npm install`). Afterward, I deleted the custom declaration file entirely and reran the build: it passed clean with zero type errors, confirming the original issue was a corrupted install, not a real gap in Firebase's SDK.
+
+**2. Caught a genuine gap in my own prompt sequence.**
+The Favourites page rendered completely blank even after Firestore was confirmed to be saving data correctly. Tracing it back, I found the cause wasn't a bug in generated code at all — I had prompted Copilot to implement `FavouritesModel.ts`, but never actually wrote the follow-up prompt to implement the `useFavouritesViewModel` hook or the `FavouritesView` component that would consume it. They were still empty placeholder files from an earlier scaffolding step. This wasn't AI making a mistake — it was a step I forgot to ask for, and I only found it by actually testing the page instead of assuming the feature was complete because related pieces had been built.
+
+**3. Isolated two independent, stacked root causes behind one symptom.**
+The Favourite (heart) button appeared to do nothing when clicked while logged in. Rather than assume a single cause, I checked the browser console and network tab and found two separate problems layered on top of each other: my browser's built-in tracking-prevention feature was silently blocking Firestore's real-time connection requests, *and*, independently, I had never actually clicked "Create database" in the Firebase console — the Firestore database itself didn't exist yet, even though the project did. Fixing only one of these wouldn't have solved the symptom; I had to identify and resolve both.
+
+**4. Reviewed and approved a security prompt rather than blindly clicking through it.**
+When reinstalling packages, npm flagged two dependencies (`@firebase/util` and `protobufjs`) as having install scripts pending review, as part of npm's newer script-approval security feature. Instead of automatically approving everything, I checked what each package actually was — confirming both are legitimate, expected dependencies of the official Firebase SDK — before approving them.
+
+**5. Traced several "it's broken" symptoms to configuration/environment causes, not code.**
+A handful of issues that looked like code bugs at first turned out to be missing setup steps that had nothing to do with the generated code:
+- OMDb API calls returning 401 — traced to an unsaved `.env` file, not a code error.
+- Firebase throwing `auth/configuration-not-found` — traced to Authentication never being explicitly enabled in the Firebase console (a separate step from creating the project).
+- A runtime `SyntaxError` about a missing export, right after a file-rename refactor — traced to Vite's dev-server cache still holding a stale reference to the old file, not a broken import; fixed by clearing `node_modules/.vite` and restarting.
+
+In each case, I resisted the urge to start rewriting code and instead checked configuration and environment first — since the actual error messages pointed there once I read them carefully rather than assuming AI-generated code was automatically the point of failure.
+
+**6. Made deliberate architecture choices that diverged from the reference implementation.**
+The session I was following as a model used Firebase Realtime Database for favourites; I chose to use Cloud Firestore instead, since it's the more actively recommended, better-querying option for new projects, and nothing about this app's data needs called for Realtime Database's specific strengths. I also consolidated several of the reference implementation's split, incremental prompts (e.g., building the OMDb service in two separate steps) into single, more complete prompts, since the split only existed for a live teaching demo and wasn't necessary once I understood the pattern.
