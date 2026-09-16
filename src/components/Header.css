@@ -1,0 +1,126 @@
+.site-header {
+  align-items: center;
+  background: #17212b;
+  border-bottom: 1px solid #2d3b48;
+  color: #f4f7f9;
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  padding: 1rem clamp(1rem, 4vw, 4rem);
+}
+
+.site-nav {
+  display: flex;
+  flex-shrink: 0;
+  gap: 1.5rem;
+}
+
+.site-nav__link {
+  color: #b9c7d2;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.5rem 0;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.site-nav__link:hover,
+.site-nav__link:focus-visible {
+  color: #ffffff;
+}
+
+.site-nav__link:focus-visible,
+.search-controls__input:focus-visible,
+.search-controls__button:focus-visible,
+.logout-button:focus-visible,
+.login-link:focus-visible {
+  outline: 2px solid #72d6c9;
+  outline-offset: 3px;
+}
+
+.search-controls {
+  display: flex;
+  max-width: 28rem;
+  width: 100%;
+}
+
+.search-controls__input {
+  background: #243341;
+  border: 1px solid #405363;
+  border-radius: 0.4rem 0 0 0.4rem;
+  color: #f4f7f9;
+  font: inherit;
+  min-width: 0;
+  padding: 0.65rem 0.8rem;
+  width: 100%;
+}
+
+.search-controls__input::placeholder {
+  color: #9aabb8;
+}
+
+.search-controls__button {
+  background: #72d6c9;
+  border: 1px solid #72d6c9;
+  border-radius: 0 0.4rem 0.4rem 0;
+  color: #102329;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.search-controls__button:hover {
+  background: #9ae6dc;
+  border-color: #9ae6dc;
+}
+
+.logout-button {
+  background: transparent;
+  border: 1px solid #405363;
+  border-radius: 0.4rem;
+  color: #b9c7d2;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.65rem 1rem;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.logout-button:hover {
+  background: #243341;
+  border-color: #72d6c9;
+  color: #ffffff;
+}
+
+.login-link {
+  border: 1px solid #72d6c9;
+  border-radius: 0.4rem;
+  color: #72d6c9;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.login-link:hover {
+  background: #72d6c9;
+  color: #102329;
+}
+
+@media (max-width: 600px) {
+  .site-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .site-nav {
+    justify-content: space-between;
+  }
+
+  .search-controls {
+    max-width: none;
+  }
+}

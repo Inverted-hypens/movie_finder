@@ -1,0 +1,30 @@
+.home-view {
+  background: #101820;
+  color: #f4f7f9;
+  min-height: calc(100vh - 5rem);
+  padding: clamp(1.25rem, 4vw, 3rem) clamp(1rem, 4vw, 4rem);
+}
+
+.home-view__status {
+  color: #b9c7d2;
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.home-view__status--error {
+  color: #ffaaa5;
+}
+
+.movie-grid {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  list-style: none;
+  margin: 0 auto;
+  max-width: 88rem;
+  padding: 0;
+}
+
+.movie-grid__item {
+  min-width: 0;
+}
