@@ -2,7 +2,7 @@
 
 A React and TypeScript movie search application built with Vite. It uses the OMDb API for movie searches and Firebase Authentication and Cloud Firestore for user accounts and favourites.
 
-**Live app:** _add your Netlify URL here_
+**Live app:** _https://mooveefinder.netlify.app/_
 
 ## Development
 
